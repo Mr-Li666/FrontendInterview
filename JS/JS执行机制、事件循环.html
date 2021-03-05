@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- https://juejin.cn/post/6844903512845860872 -->
+  javascript是单线程语言，多线程都是用单线程模拟出来的。
+  事件循环：是js的执行机制
+    同步任务 异步任务：setTimeout setInterval 。
+      任务进入执行栈，判断是同步任务还是异步任务，同步任务进入主线程，异步任务进入event table，注册回调函数，然后将函数压入event quene
+      主线程任务执行完后，开始执行异步任务中Event table中的函数。
+      js引擎会不断的检查主线程执行栈是否为空，一旦为空，就会去event quene检查是否有等待被调用的函数
+      settimeout中的函数，并不是过了几秒后开始执行，而是在指定时间内将函数压入event quene中。
+
+    宏任务和微任务：
+      宏任务：script setTimeout setInterval
+      微任务：promise.then()  process.nextTick
+      进入整体代码后，即script宏任务，开始第一次循环。先执行宏任务，再执行微任务。
+          执行完后，开始进入第二次循环。在这次循环还是先执行宏任务，再执行微任务。
+  <script>
+    // setTimeout(function () {
+    //   console.log('setTimeout');
+    // })
+
+    // new Promise(resolve => {
+    //   console.log('promise');
+    //   resolve('success')
+    // }).then(success => {
+    //   console.log(success);
+    // }).catch((err) => {
+    //   console.log(err)
+    // }) 
+
+    // console.log('console');
+        // 执行顺序：promise  console success setTimeout
+
+    console.log('1');
+
+    setTimeout(function () {
+      console.log('2');
+      process.nextTick(function () {
+        console.log('3');
+      })
+      new Promise(function (resolve) {
+        console.log('4');
+        resolve();
+      }).then(function () {
+        console.log('5')
+      })
+    })
+    process.nextTick(function () {
+      console.log('6');
+    })
+    new Promise(function (resolve) {
+      console.log('7');
+      resolve();
+    }).then(function () {
+      console.log('8')
+    })
+
+    setTimeout(function () {
+      console.log('9');
+      process.nextTick(function () {
+        console.log('10');
+      })
+      new Promise(function (resolve) {
+        console.log('11');
+        resolve();
+      }).then(function () {
+        console.log('12')
+      })
+    })
+    // 执行顺序： 1 7 6 8 2 4 3 5 9 11 10 12
+
+  </script>
+</body>
+
+</html>
