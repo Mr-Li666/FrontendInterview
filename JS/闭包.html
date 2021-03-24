@@ -65,6 +65,22 @@
     alert(object.getNameFunc()());
 
     // 3. 内存泄露：内部函数被return出来后，在执行完后，自身的变量被摧毁，但是一直带着父函数的变量，变量一直存在于内存中，造成内存泄露
+
+    // 使用场景：
+    // （1）防抖 节流
+    // （2）定时器
+    function outer() {
+      let i = 0;
+      return function () {
+        console.log(i++)
+      }
+    }
+    let f1 = outer();
+    let f2 = outer();
+    f1() //0
+    f1()//1
+    f2()//0
+    f2()//1
   </script>
 </body>
 
